@@ -2,9 +2,21 @@ import { useEffect, useState } from "react";
 import apiClient from "../services/api-client";
 import { CanceledError } from "axios";
 
-interface Game {
+//to access this interface we need to export it from this module.
+export interface Platform {
   id: number;
   name: string;
+  slug: string;
+}
+
+export interface Game {
+  id: number;
+  name: string;
+  background_image: string;
+  //parent_platform:It's an array of objects where each object has a property called platform of type platform.
+  //platforms is not a platform array
+  parent_platforms: { platform: Platform }[];
+  metacritic: number;
 }
 
 interface FetchGamesResponse {
