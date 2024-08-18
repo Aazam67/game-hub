@@ -25,21 +25,27 @@ interface FaetchGamesResponse {
 const useGames = () => {
   const [games, setGames] = useState<Game[]>([]);
   const [error, setError] = useState("");
+  const [isLoading, setLoading] = useState(false);
 
   useEffect(() => {
     const controller = new AbortController();
+    setLoading(true);
     apiClient
       .get<FaetchGamesResponse>("/games", { signal: controller.signal })
-      .then((res) => setGames(res.data.results))
+      .then((res) => {
+        setGames(res.data.results);
+        setLoading(false);
+      })
       .catch((err) => {
         if (err instanceof CanceledError) return;
         setError(err.message);
+        setLoading(false);
       });
     return () => controller.abort();
   }, []);
   // i wrote above empty array [] because i want to update effect hook when we have changes in list.
   //Without this, we constantly send requests to our backend.
 
-  return { games, error };
+  return { games, error, isLoading };
 };
 export default useGames;
