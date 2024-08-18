@@ -1,6 +1,4 @@
-import { useEffect, useState } from "react";
-import apiClient from "../services/api-client";
-import { CanceledError } from "axios";
+import useData from "./useData";
 
 export interface Platform {
   id: number;
@@ -13,39 +11,8 @@ export interface Game {
   name: string;
   background_image: string;
   metacritic: number;
-
   parent_platforms: { platform: Platform }[];
 }
 
-interface FaetchGamesResponse {
-  count: number;
-  results: Game[];
-}
-
-const useGames = () => {
-  const [games, setGames] = useState<Game[]>([]);
-  const [error, setError] = useState("");
-  const [isLoading, setLoading] = useState(false);
-
-  useEffect(() => {
-    const controller = new AbortController();
-    setLoading(true);
-    apiClient
-      .get<FaetchGamesResponse>("/games", { signal: controller.signal })
-      .then((res) => {
-        setGames(res.data.results);
-        setLoading(false);
-      })
-      .catch((err) => {
-        if (err instanceof CanceledError) return;
-        setError(err.message);
-        setLoading(false);
-      });
-    return () => controller.abort();
-  }, []);
-  // i wrote above empty array [] because i want to update effect hook when we have changes in list.
-  //Without this, we constantly send requests to our backend.
-
-  return { games, error, isLoading };
-};
+const useGames = () => useData<Game>("/games");
 export default useGames;
